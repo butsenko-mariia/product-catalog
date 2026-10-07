@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "envFile": "$C:\\ReactProjects\\product-catalog\\.env",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -10,6 +11,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mantine/core": "^9.7.1",
+    "@mantine/hooks": "^9.7.1",
+    "@mantine/notifications": "^9.7.1",
+    "axios": "^1.20.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.4"
