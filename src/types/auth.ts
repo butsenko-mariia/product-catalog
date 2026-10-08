@@ -10,6 +10,7 @@ export interface User {
 export interface AuthResponse extends User {
   accessToken: string;
   refreshToken: string;
+  expiresInMins: number;
 }
 
 export interface AuthContextType {

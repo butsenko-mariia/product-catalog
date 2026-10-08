@@ -1,7 +1,9 @@
 import { Button, Image, Text } from '@mantine/core';
 import React from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Header() {
+  const { logout } = useAuth();
   return (
     <div
       style={{
@@ -37,7 +39,7 @@ export default function Header() {
             <Text c="white">your profile</Text>
           </div>
         </Button>
-        <Button h="auto" variant="subtle">
+        <Button h="auto" variant="subtle" onClick={logout}>
           <div
             style={{
               display: 'flex',
