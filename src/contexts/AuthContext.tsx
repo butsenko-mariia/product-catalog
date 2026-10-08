@@ -10,10 +10,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const login = async (username: string, password: string) => {
+  const login = async (
+    username: string,
+    password: string,
+    expiresInMins?: number
+  ) => {
     const response = await api.post<AuthResponse>('/auth/login', {
       username,
       password,
+      expiresInMins,
     });
 
     const { accessToken, refreshToken, ...userData } = response.data;
