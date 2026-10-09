@@ -5,6 +5,17 @@ export interface Product {
   category: string;
   price: string;
   images: string[];
-  discountPercentage: string;
+  discountPercentage?: string;
   rating: number;
+  stock?: number;
+  brand?: string;
+  reviews: Review[];
+}
+
+export interface Review {
+  rating: number;
+  comment: string;
+  date: string;
+  reviewerName: string;
+  reviewerEmail: string;
 }

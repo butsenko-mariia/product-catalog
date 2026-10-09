@@ -20,7 +20,7 @@ import {
 import { Product } from '../types/products';
 import Header from '../components/Header';
 import useDebounce from '../contexts/Debounce';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function ProductsPage() {
@@ -77,6 +77,7 @@ export default function ProductsPage() {
         setFilterList(response.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
+        setIsError(true);
       }
     };
     fetchFilters();
@@ -332,15 +333,19 @@ export default function ProductsPage() {
 function ProductCard({ product }: { product: Product }) {
   const [isOnHover, setIsOnHover] = useState(false);
 
+  const navigate = useNavigate();
+
   return (
     <div
       style={{
         position: 'relative',
         width: '100%',
         minHeight: '380px',
+        cursor: 'pointer',
       }}
       onMouseEnter={() => setIsOnHover(true)}
       onMouseLeave={() => setIsOnHover(false)}
+      onClick={() => navigate(`/products/${product.id}`)}
     >
       <Card
         key={product.id}
@@ -409,6 +414,10 @@ function ProductCard({ product }: { product: Product }) {
             style={{ minHeight: 40, marginTop: 10 }}
             fullWidth
             bg="rgba(230,73,128)"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log('Товар добавлен в корзину');
+            }}
           >
             Buy now
           </Button>
