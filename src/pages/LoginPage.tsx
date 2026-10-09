@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 import {
   Button,
@@ -12,6 +12,7 @@ import {
 } from '@mantine/core';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
   const [userLogin, setUserLogin] = useState('');
@@ -19,7 +20,13 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { login } = useAuth();
+  const { user, login } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (user) {
+      navigate('/products', { replace: true });
+    }
+  }, [user, navigate]);
 
   const isFormValid = userLogin.trim().length > 0 && password.trim().length > 0;
 
@@ -37,6 +44,7 @@ export default function LoginPage() {
 
     try {
       await login(userLogin, password);
+      navigate('/products', { replace: true });
     } catch (err: unknown) {
       const responseData =
         typeof err === 'object' && err !== null && 'response' in err
