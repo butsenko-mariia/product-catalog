@@ -1,16 +1,46 @@
-# React + Vite
+# Product Catalog App
+В даному проекті було створено SPA-застосунок «Каталог товарів», розроблений на React з використанням TypeScript та Mantine UI. Застосунок взаємодіє з DummyJSON API.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Vercel Demo: (https://product-catalog-btul.vercel.app)
 
-Currently, two official plugins are available:
+# В ході роботи було реалізовано: 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+авторизацію користувача (логін/пароль), відновлення сесії після перезавантаження, захищені маршрути (Protected Routes);
 
-## React Compiler
+взаємодію з API, де запити виконуються через налаштований клієнт axios із перехоплювачами (interceptors), токен підставляється автоматично, реалізовано автоматичне оновлення токена (Refresh Token) при помилці 401;
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+список товарів, а саме: пагінація, фільтрація за категорією, пошук (з debounce 400 мс) та сортування, стан списку зберігається у query-параметрах URL;
 
-## Expanding the ESLint configuration
+управління даними шляхом створення, редагування та видалення товарів, вони оновлюють UI локально на основі успішної відповіді без зайвих запитів до API. Оскільки з DummyJSON не можна змінювати значення підставної бд;
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+усунуто гонки запитів за допомогою AbortController під час швидкого введення тексту в поле пошуку, реалізовано кошик покупок на базі localStorage зі лічильником у шапці, що синхронізується через кастомні події (CustomEvents).
+
+# Що не встигли (або потребує доопрацювання)
+Не було налаштовано Vitest та React Testing Library для покриття компонентів тестами.
+Не було додано темну тему.
+Не реалізовано видалення з відкатом при помилці.
+Доступність реалізована частково - для зображень товарів вказано атрибут alt, інпути мають підписи label, а Mantine-компоненти базово підтримують навігацію з клавіатури, проте спеціальної ARIA-размітки або тестування доступності не проводилось.
+
+# Прийняті рішення та компроміси
+В якості UI-бібліотеки було обрано Mantine UI для прискорення розробки та забезпечення стабільного, доступного UI .
+
+Замість складних бібліотек  глобальний стан (авторизація) керується через стандартний Context API, передбачаючи що жля цього розміру застосунку цього цілком достатньо.
+
+Обробка даних без TanStack Query:  запити та їх скасування (AbortController) реалізовані за допомогою нативних хуків useEffect та локального стану.
+
+Синхронізація кошика теж була неможливою, оскільки кошик реалізовано локально, для міжкомпонентної комунікації між сторінкою товару та шапкою застосовано window.dispatchEvent, що дозволило уникнути створення додаткового глобального контексту спеціально для лічильника кошика.
+
+## Команди для запуску
+
+1. Встановіть залежності:
+   ```bash
+   npm install
+Створіть файл .env у корені проєкту та додайте базовий URL для API:
+
+Фрагмент коду
+VITE_API_URL=[https://dummyjson.com](https://dummyjson.com)
+Запустіть проєкт у режимі розробки:
+
+Bash
+npm run dev
+
