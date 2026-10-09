@@ -81,7 +81,11 @@ export default function ProductsPage() {
         const response = await api.get('/products/category-list');
         setFilterList(response.data);
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Products categories failed to fetch ' + error,
+          color: 'red',
+        });
         setIsError(true);
       }
     };
@@ -138,11 +142,14 @@ export default function ProductsPage() {
         setIsLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) {
-          console.log('The previous request has been canceled');
           return;
         }
 
-        console.error('Error fetching products:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Products failed to fetch ' + error,
+          color: 'red',
+        });
         setIsError(true);
         setIsLoading(false);
       }
@@ -474,6 +481,15 @@ function ProductCard({
               bg="rgba(230,73,128)"
               onClick={(e) => {
                 e.stopPropagation();
+
+                const currentCart = JSON.parse(
+                  localStorage.getItem('cart') || '[]'
+                );
+                localStorage.setItem(
+                  'cart',
+                  JSON.stringify([...currentCart, product])
+                );
+                window.dispatchEvent(new Event('cartUpdated'));
                 notifications.show({
                   title: 'Product was added to cart',
                   message: 'Product was added to cart',

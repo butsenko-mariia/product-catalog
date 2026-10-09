@@ -16,3 +16,36 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        const res = await axios.post(
+          `${import.meta.env.VITE_API_URL}/auth/refresh`,
+          {
+            refreshToken,
+            expiresInMins: 30,
+          }
+        );
+
+        localStorage.setItem('accessToken', res.data.accessToken);
+        localStorage.setItem('refreshToken', res.data.refreshToken);
+
+        originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
