@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { User, AuthResponse, AuthContextType } from '../types/auth';
 import { api } from '../api/axios';
+import { notifications } from '@mantine/notifications';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -47,7 +48,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           const response = await api.get<User>('/auth/me');
           setUser(response.data);
         } catch (error) {
-          console.error('Session restore error:', error);
+          notifications.show({
+            title: 'Error',
+            message: 'Session restore error:' + error,
+            color: 'red',
+          });
           logout();
         }
       }
@@ -69,7 +74,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useAuth = () => {
   const context = React.useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    notifications.show({
+      title: 'Error',
+      message: 'useAuth must be used within an AuthProvider',
+      color: 'red',
+    });
+    throw new Error();
   }
   return context;
 };

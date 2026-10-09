@@ -11,6 +11,7 @@ import {
   Alert,
 } from '@mantine/core';
 import { useAuth } from '../contexts/AuthContext';
+import Header from '../components/Header';
 
 export default function LoginPage() {
   const [userLogin, setUserLogin] = useState('');
@@ -52,6 +53,7 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
+      <Header />
       <div className="login-form-container">
         <Container size={420} my={40}>
           <Title ta="center" className="title">
