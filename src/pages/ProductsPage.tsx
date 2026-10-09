@@ -16,6 +16,7 @@ import {
   Center,
   Alert,
   Paper,
+  Box,
 } from '@mantine/core';
 import { Product } from '../types/products';
 import Header from '../components/Header';
@@ -198,9 +199,8 @@ export default function ProductsPage() {
         }}
         size="xl"
         fw={700}
-        p={50}
-        pl={100}
-        pr={100}
+        p={{ base: 15, sm: 30, md: 50 }}
+        px={{ base: 15, sm: 50, md: 100 }}
         styles={{
           input: {
             color: 'rgba(137,118,203)',
@@ -218,6 +218,7 @@ export default function ProductsPage() {
           size="40px"
           fw={700}
           c="rgb(200, 191, 231)"
+          my={50}
         >
           NOTHING WAS FOUND
         </Text>
@@ -233,13 +234,15 @@ export default function ProductsPage() {
           >
             {totalProducts} products were found
           </Text>
-          <div
+          <Box
             style={{
               display: 'flex',
               flexDirection: 'row',
-              padding: 50,
+
               gap: 20,
             }}
+            px={{ base: 20, sm: 50 }}
+            py={20}
           >
             <Select
               label="Order by"
@@ -282,20 +285,16 @@ export default function ProductsPage() {
                 },
               }}
             />
-          </div>
+          </Box>
 
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              padding: 50,
-              gap: 20,
-            }}
-          >
+          <Box px={{ base: 20, sm: 50 }} mb={20}>
             <Button onClick={() => setIsModalOpen(true)}>Add a product</Button>
-          </div>
+          </Box>
 
-          <div style={{ width: '70%', alignSelf: 'center', margin: '0 auto' }}>
+          <Box
+            w={{ base: '95%', sm: '85%', lg: '70%' }}
+            style={{ margin: '0 auto' }}
+          >
             {isLoading && <SceletonShowing />}
             {!isLoading && isError && (
               <Center my={50}>
@@ -318,7 +317,7 @@ export default function ProductsPage() {
               </Center>
             )}
 
-            <SimpleGrid cols={4}>
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="lg">
               {products.map((product: Product) => (
                 <ProductCard
                   key={product.id}
@@ -330,7 +329,7 @@ export default function ProductsPage() {
                 />
               ))}
             </SimpleGrid>
-          </div>
+          </Box>
 
           {!isLoading && !isError && totalPages > 1 && (
             <div>
@@ -521,7 +520,7 @@ function ProductCard({
 
 function SceletonShowing() {
   return (
-    <SimpleGrid cols={4} spacing="lg">
+    <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="lg">
       {Array.from({ length: 12 }).map((_, index) => (
         <Card key={index} shadow="sm" p="md" radius="md" withBorder>
           <Skeleton height={200} mb="xl" radius="md" />

@@ -17,6 +17,7 @@ import {
   Container,
   Stack,
   Loader,
+  Box,
 } from '@mantine/core';
 import { api } from '../api/axios';
 import { Product, Review } from '../types/products';
@@ -103,15 +104,17 @@ export default function ProductDetailPage() {
           ) : (
             productDetails && (
               <>
-                <SimpleGrid cols={2}>
-                  <Stack>
+                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
+                  <Stack justify="center" align="center">
                     {productDetails.images &&
                       productDetails.images.length > 0 && (
-                        <Group
-                          maw="50%"
-                          miw={500}
+                        <Box
+                          w="100%"
+                          pos="relative"
                           style={{
-                            position: 'relative',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                           }}
                         >
                           <Button
@@ -122,9 +125,10 @@ export default function ProductDetailPage() {
                             style={{
                               position: 'absolute',
                               left: 0,
+                              zIndex: 2,
                             }}
                             onClick={() => {
-                              if (currentImageIndex > 1)
+                              if (currentImageIndex > 0)
                                 setCurrentImageIndex((prev) => prev - 1);
                             }}
                           >
@@ -134,8 +138,8 @@ export default function ProductDetailPage() {
                             src={productDetails.images?.[currentImageIndex]}
                             alt={productDetails.title}
                             fit="contain"
-                            mih={400}
-                            miw={500}
+                            h={{ base: 260, sm: 350, md: 400 }}
+                            w="100%"
                           />
                           <Button
                             fz="lg"
@@ -145,6 +149,7 @@ export default function ProductDetailPage() {
                             style={{
                               position: 'absolute',
                               right: 0,
+                              zIndex: 2,
                             }}
                             onClick={() => {
                               if (
@@ -156,22 +161,27 @@ export default function ProductDetailPage() {
                           >
                             &#8594;
                           </Button>
-                        </Group>
+                        </Box>
                       )}
                   </Stack>
 
-                  <Group>
-                    <Stack gap={20} fz="md">
+                  <Group w="100%">
+                    <Stack gap={20} fz="md" w="100%">
                       <Badge
                         variant="default"
                         p="md"
                         c="rgba(0,180,190)"
                         fz="s"
+                        style={{ alignSelf: 'flex-start' }}
                       >
                         {productDetails.brand}/{productDetails.category}
                       </Badge>
 
-                      <Title fz="50px" fw="bold" mb="md">
+                      <Title
+                        fz={{ base: '28px', sm: '38px', md: '50px' }}
+                        fw="bold"
+                        mb="md"
+                      >
                         {productDetails.title}
                       </Title>
 
@@ -181,7 +191,7 @@ export default function ProductDetailPage() {
                           fractions={2}
                           readOnly
                         />
-                        {productDetails.reviews.length} total reviews
+                        {productDetails.reviews?.length || 0} total reviews
                       </Group>
 
                       <Group pt="md" pb="md">
@@ -205,31 +215,33 @@ export default function ProductDetailPage() {
                         )}
                       </Group>
 
-                      <Group>
-                        <Text>
+                      <Box>
+                        <Text mb="xs">
                           <i>Description</i>
                         </Text>
                         <Text c="dimmed" mb="xl">
                           {productDetails.description}
                         </Text>
-                      </Group>
+                      </Box>
 
                       <Divider />
 
-                      <Group justify="space-between" mb="sm">
-                        <Text fw={500}>Availability:</Text>
-                        <Text
-                          c={
-                            productDetails.stock && productDetails.stock > 0
-                              ? 'green'
-                              : 'red'
-                          }
-                          fw={600}
-                        >
-                          {productDetails.stock && productDetails.stock > 0
-                            ? `${productDetails.stock} in stock`
-                            : 'Out of stock'}
-                        </Text>
+                      <Stack gap="sm" mb="sm">
+                        <Group justify="space-between">
+                          <Text fw={500}>Availability:</Text>
+                          <Text
+                            c={
+                              productDetails.stock && productDetails.stock > 0
+                                ? 'green'
+                                : 'red'
+                            }
+                            fw={600}
+                          >
+                            {productDetails.stock && productDetails.stock > 0
+                              ? `${productDetails.stock} in stock`
+                              : 'Out of stock'}
+                          </Text>
+                        </Group>
 
                         <Button
                           fullWidth
@@ -239,8 +251,7 @@ export default function ProductDetailPage() {
                           radius="md"
                           mih="60"
                           fw="bold"
-                          fz="30"
-
+                          fz={{ base: '20px', md: '30px' }}
                           onClick={(e) => {
                             e.stopPropagation();
 
@@ -261,7 +272,7 @@ export default function ProductDetailPage() {
                         >
                           Add to Cart
                         </Button>
-                      </Group>
+                      </Stack>
                     </Stack>
                   </Group>
                 </SimpleGrid>
@@ -275,24 +286,21 @@ export default function ProductDetailPage() {
         productDetails?.reviews &&
         productDetails.reviews.length > 0 && (
           <Container size="lg" mt="70" mb="70">
-            {productDetails &&
-              productDetails.reviews &&
-              productDetails.reviews.length > 0 && (
-                <Card>
-                  <Text
-                    w="100%"
-                    ta="center"
-                    fz="30"
-                    fw={800}
-                    c="rgba(0, 158, 134)"
-                  >
-                    Customers reviews
-                  </Text>
-                  {productDetails.reviews.map((review: Review) => (
-                    <ReviewCard key={review.reviewerEmail} review={review} />
-                  ))}
-                </Card>
-              )}
+            <Card>
+              <Text
+                w="100%"
+                ta="center"
+                fz="30"
+                fw={800}
+                c="rgba(0, 158, 134)"
+                mb="md"
+              >
+                Customers reviews
+              </Text>
+              {productDetails.reviews.map((review: Review) => (
+                <ReviewCard key={review.reviewerEmail} review={review} />
+              ))}
+            </Card>
           </Container>
         )}
     </div>
@@ -306,39 +314,29 @@ function ReviewCard({ review }: { review: Review }) {
       bg="rgba(0, 255, 217, 0.24)"
       p="md"
       radius="md"
-      m="md"
+      my="md"
     >
       <Group c="rgba(0, 188, 163)" display="block">
-        <Stack
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            position: 'relative',
-          }}
-        >
-          <Text fz="25" fw={800} c="rgba(0, 158, 134)">
+        <Group justify="space-between" mb="xs">
+          <Text
+            fz={{ base: '18px', sm: '25px' }}
+            fw={800}
+            c="rgba(0, 158, 134)"
+          >
             {review.reviewerName}
           </Text>
-          <span
-            style={{
-              position: 'absolute',
-              right: '0',
-            }}
-          >
-            {review.date}
-          </span>
-        </Stack>
-        <Text>
+          <Text fz="sm">{review.date}</Text>
+        </Group>
+        <Text mb="xs">
           <i>{review.reviewerEmail}</i>
         </Text>
-        <Stack mt="10">
+        <Stack gap="xs" mt="10">
           <Rating
             value={review.rating}
             fractions={2}
             color="rgba(0, 188, 163)"
             readOnly
           />
-
           <Text c="rgba(0, 158, 134)">{review.comment}</Text>
         </Stack>
       </Group>
