@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage.tsx';
 import ProductsPage from './pages/ProductsPage.tsx';
 import ProductDetailsPage from './pages/ProductDetailPage.tsx';
+import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 
 function App() {
   return (
@@ -10,8 +11,22 @@ function App() {
       <div className="app-container">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/products/:id" element={<ProductDetailsPage />} />
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute>
+                <ProductsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products/:id"
+            element={
+              <ProtectedRoute>
+                <ProductDetailsPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </div>
     </Router>

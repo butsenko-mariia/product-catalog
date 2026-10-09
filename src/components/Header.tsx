@@ -84,7 +84,9 @@ export default function Header() {
               }}
             >
               <Image src={user?.image || '/photos/11.png'} w={60} h={60} />
-              <Text c="white">your profile</Text>
+              <Text c="white">
+                {user ? `${user.firstName} ${user.lastName}` : 'your profile'}
+              </Text>
             </div>
           </Button>
           <Button h="auto" variant="subtle" onClick={handleLogout}>

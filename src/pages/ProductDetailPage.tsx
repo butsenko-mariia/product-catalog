@@ -240,6 +240,24 @@ export default function ProductDetailPage() {
                           mih="60"
                           fw="bold"
                           fz="30"
+
+                          onClick={(e) => {
+                            e.stopPropagation();
+
+                            const currentCart = JSON.parse(
+                              localStorage.getItem('cart') || '[]'
+                            );
+                            localStorage.setItem(
+                              'cart',
+                              JSON.stringify([...currentCart, productDetails])
+                            );
+                            window.dispatchEvent(new Event('cartUpdated'));
+                            notifications.show({
+                              title: 'Product was added to cart',
+                              message: 'Product was added to cart',
+                              color: 'pink',
+                            });
+                          }}
                         >
                           Add to Cart
                         </Button>

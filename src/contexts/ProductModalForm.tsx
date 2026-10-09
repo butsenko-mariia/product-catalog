@@ -60,23 +60,26 @@ export const ProductModalForm: React.FC<ProductModalFormProps> = ({
   }, [initialData, opened]);
 
   const handleSubmit = async () => {
-    setIsLoading(true);
+    const priceNum = Number(formData.price);
+    const stockNum = Number(formData.stock);
+    if (
+      !formData.title.trim() ||
+      formData.price === '' ||
+      isNaN(priceNum) ||
+      priceNum <= 0 ||
+      isNaN(stockNum) ||
+      stockNum <= 0
+    ) {
+      notifications.show({
+        title: 'Warning',
+        message: 'Title is required, Price and Stock must be greater than 0!',
+        color: 'orange',
+      });
+      return;
+    }
 
     try {
-      if (
-        formData.title.trim() === '' ||
-        Number(formData.price) <= 0 ||
-        !formData.stock ||
-        Number(formData.stock) < 1
-      ) {
-        notifications.show({
-          title: 'Warning',
-          message: 'Fill the required inputs!',
-          color: 'orange',
-        });
-        return;
-      }
-
+      setIsLoading(true);
       const endpoint = isEdit ? `/products/${initialData.id}` : '/products/add';
 
       const response = isEdit
@@ -163,12 +166,10 @@ export const ProductModalForm: React.FC<ProductModalFormProps> = ({
               const value = val;
               const num = Number(value);
 
-              if (value === '' || (!isNaN(num) && num > 0)) {
-                setFormData({
-                  ...formData,
-                  price: value === '' ? '' : num.toString(),
-                });
-              }
+              setFormData({
+                ...formData,
+                price: value === '' ? '' : num.toString(),
+              });
             }}
           />
           <NumberInput
@@ -179,12 +180,10 @@ export const ProductModalForm: React.FC<ProductModalFormProps> = ({
               const value = val;
               const num = Number(value);
 
-              if (value === '' || (!isNaN(num) && num > 0)) {
-                setFormData({
-                  ...formData,
-                  stock: value === '' ? 0 : num,
-                });
-              }
+              setFormData({
+                ...formData,
+                stock: value === '' ? 0 : num,
+              });
             }}
           />
           <TextInput
