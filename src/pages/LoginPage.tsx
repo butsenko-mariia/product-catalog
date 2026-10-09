@@ -56,11 +56,18 @@ export default function LoginPage() {
       <Header />
       <div className="login-form-container">
         <Container size={420} my={40}>
-          <Title ta="center" className="title">
+          <Title ta="center" className="title" c="rgba(71, 67, 147)">
             Log in to your account
           </Title>
 
-          <Paper withBorder shadow="sm" p={22} mt={30} radius="md">
+          <Paper
+            withBorder
+            shadow="sm"
+            p={22}
+            mt={30}
+            radius="md"
+            c="rgba(71, 67, 147)"
+          >
             <form onSubmit={handleLogin}>
               <TextInput
                 label="Login"

@@ -2,7 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Product } from '../types/products';
 import { api } from '../api/axios';
 import { notifications } from '@mantine/notifications';
-import { Button, Group, Modal, Stack, TextInput } from '@mantine/core';
+import {
+  Button,
+  Group,
+  Modal,
+  NumberInput,
+  Stack,
+  Textarea,
+  TextInput,
+} from '@mantine/core';
 
 interface ProductModalFormProps {
   opened: boolean;
@@ -21,7 +29,9 @@ export const ProductModalForm: React.FC<ProductModalFormProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
+    description: '',
     price: '0',
+    stock: 0,
     category: '',
   });
 
@@ -30,11 +40,19 @@ export const ProductModalForm: React.FC<ProductModalFormProps> = ({
       if (initialData) {
         setFormData({
           title: initialData.title,
+          description: initialData.description,
           price: initialData.price,
           category: initialData.category,
+          stock: initialData.stock ?? 0,
         });
       } else {
-        setFormData({ title: '', price: '0', category: '' });
+        setFormData({
+          title: '',
+          description: '',
+          price: '0',
+          stock: 0,
+          category: '',
+        });
       }
     };
 
@@ -43,7 +61,22 @@ export const ProductModalForm: React.FC<ProductModalFormProps> = ({
 
   const handleSubmit = async () => {
     setIsLoading(true);
+
     try {
+      if (
+        formData.title.trim() === '' ||
+        Number(formData.price) <= 0 ||
+        !formData.stock ||
+        Number(formData.stock) < 1
+      ) {
+        notifications.show({
+          title: 'Warning',
+          message: 'Fill the required inputs!',
+          color: 'orange',
+        });
+        return;
+      }
+
       const endpoint = isEdit ? `/products/${initialData.id}` : '/products/add';
 
       const response = isEdit
@@ -109,17 +142,50 @@ export const ProductModalForm: React.FC<ProductModalFormProps> = ({
         <Stack>
           <TextInput
             label="Title"
+            required
             value={formData.title}
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
             }
           />
-          <TextInput
-            label="Price"
-            value={formData.price}
+          <Textarea
+            label="Description"
+            value={formData.description}
             onChange={(e) =>
-              setFormData({ ...formData, price: e.target.value })
+              setFormData({ ...formData, description: e.target.value })
             }
+          />
+          <NumberInput
+            label="Price"
+            required
+            value={formData.price}
+            onChange={(val) => {
+              const value = val;
+              const num = Number(value);
+
+              if (value === '' || (!isNaN(num) && num > 0)) {
+                setFormData({
+                  ...formData,
+                  price: value === '' ? '' : num.toString(),
+                });
+              }
+            }}
+          />
+          <NumberInput
+            label="Stock"
+            required
+            value={formData.stock}
+            onChange={(val) => {
+              const value = val;
+              const num = Number(value);
+
+              if (value === '' || (!isNaN(num) && num > 0)) {
+                setFormData({
+                  ...formData,
+                  stock: value === '' ? 0 : num,
+                });
+              }
+            }}
           />
           <TextInput
             label="Category"
@@ -134,7 +200,15 @@ export const ProductModalForm: React.FC<ProductModalFormProps> = ({
               <Button
                 color="red"
                 variant="outline"
-                onClick={handleDelete}
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      'Are you sure you want to delete this product'
+                    )
+                  ) {
+                    handleDelete();
+                  }
+                }}
                 loading={isLoading}
               >
                 Delete
