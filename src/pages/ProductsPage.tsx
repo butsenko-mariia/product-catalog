@@ -22,6 +22,8 @@ import Header from '../components/Header';
 import useDebounce from '../contexts/Debounce';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { ProductModalForm } from '../contexts/ProductModalForm';
+import { notifications } from '@mantine/notifications';
 
 export default function ProductsPage() {
   const [searchParam, setSearchParam] = useSearchParams();
@@ -43,6 +45,9 @@ export default function ProductsPage() {
   const [categoryFilter, setCategoryFilter] = useState(initialCategory);
   const [filterList, setFilterList] = useState([]);
   const [retryCount, setRetryCount] = useState(0);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const debouncedSeachQuery = useDebounce(searchQuery, 400);
   const itemsPerPage = 12;
@@ -272,6 +277,17 @@ export default function ProductsPage() {
             />
           </div>
 
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              padding: 50,
+              gap: 20,
+            }}
+          >
+            <Button onClick={() => setIsModalOpen(true)}>Add a product</Button>
+          </div>
+
           <div style={{ width: '70%', alignSelf: 'center', margin: '0 auto' }}>
             {isLoading && <SceletonShowing />}
             {!isLoading && isError && (
@@ -297,7 +313,14 @@ export default function ProductsPage() {
 
             <SimpleGrid cols={4}>
               {products.map((product: Product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onEdit={() => {
+                    setSelectedProduct(product);
+                    setIsModalOpen(true);
+                  }}
+                />
               ))}
             </SimpleGrid>
           </div>
@@ -326,13 +349,45 @@ export default function ProductsPage() {
           )}
         </div>
       )}{' '}
+      <ProductModalForm
+        opened={isModalOpen}
+
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedProduct(null);
+        }}
+
+        initialData={selectedProduct}
+
+        onSuccess={(updatedProduct, isEdit, isDelete) => {
+          if (!updatedProduct) return;
+          if (isDelete) {
+            setProducts((prev) =>
+              prev.filter((p) => p.id !== updatedProduct.id)
+            );
+          } else if (isEdit) {
+            setProducts((prev) =>
+              prev.map((p) =>
+                p.id === updatedProduct.id ? { ...p, ...updatedProduct } : p
+              )
+            );
+          } else {
+            setProducts((prev) => [updatedProduct, ...prev]);
+          }
+        }}
+      />
     </div>
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({
+  product,
+  onEdit,
+}: {
+  product: Product;
+  onEdit: () => void;
+}) {
   const [isOnHover, setIsOnHover] = useState(false);
-
   const navigate = useNavigate();
 
   return (
@@ -345,7 +400,9 @@ function ProductCard({ product }: { product: Product }) {
       }}
       onMouseEnter={() => setIsOnHover(true)}
       onMouseLeave={() => setIsOnHover(false)}
-      onClick={() => navigate(`/products/${product.id}`)}
+      onClick={() => {
+        navigate(`/products/${product.id}`);
+      }}
     >
       <Card
         key={product.id}
@@ -409,18 +466,37 @@ function ProductCard({ product }: { product: Product }) {
           </Text>
         </div>
         {isOnHover && (
-          <Button
-            radius="xl"
-            style={{ minHeight: 40, marginTop: 10 }}
-            fullWidth
-            bg="rgba(230,73,128)"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log('Товар добавлен в корзину');
-            }}
-          >
-            Buy now
-          </Button>
+          <Group>
+            <Button
+              radius="xl"
+              style={{ minHeight: 40, marginTop: 10 }}
+              fullWidth
+              bg="rgba(230,73,128)"
+              onClick={(e) => {
+                e.stopPropagation();
+                notifications.show({
+                  title: 'Product was added to cart',
+                  message: 'Product was added to cart',
+                  color: 'pink',
+                });
+              }}
+            >
+              Buy now
+            </Button>
+
+            <Button
+              variant="light"
+              radius="xl"
+              style={{ minHeight: 40 }}
+              fullWidth
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+              }}
+            >
+              Edit
+            </Button>
+          </Group>
         )}
       </Card>
     </div>
